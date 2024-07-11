@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Message from "../components/Message";
 import { IconButton, PaperProvider, TextInput } from "react-native-paper";
-import { View } from "react-native";
+import { ScrollView, View, StyleSheet, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { fetchMessages, writeMessage } from "../store-procedures";
 import { collection, onSnapshot, query, orderBy, getFirestore, Timestamp } from 'firebase/firestore';
 import { app } from '../firebase-config';
@@ -35,8 +35,10 @@ export default function Index() {
 
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <PaperProvider>
-      <View>
+    <ScrollView>
+      <View style={styles.container}>
         {messages.map(m => (
           <Message key={m.id} message={m} />
         ))}
@@ -46,12 +48,21 @@ export default function Index() {
           onChangeText={text => setText(text)}
           right= {<TextInput.Icon icon="send" 
                                   onPress={async () => {
+                                    setText("")
                                     console.log("Sending " + text + " with sender " + SENDER) // Add your function here
                                     await writeMessage(text, SENDER, Timestamp.now());
-                                    setText("")} }
-                  />} // Add your icon button here
+                                    } }
+                  />}
         />
       </View>
+    </ScrollView>
     </PaperProvider>
+    </TouchableWithoutFeedback>
+
   );
 }
+
+styles = StyleSheet.create({
+  container : {
+    padding:20,  }
+})

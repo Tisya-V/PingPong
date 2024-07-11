@@ -5,29 +5,30 @@ import { SENDER } from "../app/app-constants";
 
 export default function Message({ message }) {
     return (
-        <View style={styles.container}>
-            <Text style={(message.sender === SENDER) ? styles.yourMessage : styles.theirMessage}>{message.content}</Text>
+        <View  style={[styles.message, (message.sender === SENDER) ? styles.yourMessage : styles.theirMessage]}>
+            <Text style={styles.text}>{message.content}</Text>
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        // flex: 1,
+    message: {
+        flexDirection: "row",
+        padding: 10,
+        margin: 5,
+        borderRadius: 10,
         justifyContent: "center",
-        // alignItems: "center",
-    },
-    yourMessage: {
-        fontSize: 20,
-        color: "green",
-        alignSelf: "flex-end",
     },
     theirMessage: {
-        fontSize: 20,
-        color: "blue",
+        alignSelf: "flex-start",
+        backgroundColor: "green",
     },
-    message: {
+    yourMessage: {
+        alignSelf: "flex-end",
+        backgroundColor: "red",
+    },
+    text: {
         fontSize: 20,
-        color: "red",
+        color: "black",
     },
 });
