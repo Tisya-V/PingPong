@@ -3,9 +3,11 @@ import { View, StyleSheet, Text } from "react-native";
 import { PaperProvider } from "react-native-paper";
 import { SENDER } from "../app/app-constants";
 
-export default function Message({ message }) {
+export default function Message({ message, userID}) {
+    console.log("Message: ", message);
+    console.log("UserID: ", userID);
     return (
-        <View  style={[styles.message, (message.sender === SENDER) ? styles.yourMessage : styles.theirMessage]}>
+        <View  style={[styles.message, (message.sender === userID) ? styles.yourMessage : styles.theirMessage]}>
             <Text style={styles.text}>{message.content}</Text>
         </View>
     )
