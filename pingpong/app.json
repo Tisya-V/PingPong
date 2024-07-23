@@ -7,14 +7,16 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "resizeMode": "contain",
+      "image": "./assets/app-splash.webp",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "package": "com.tisv.pingpong"
+      "package": "com.tisv.pingpong",
+      "icon": "./assets/app-icon.jpg"
     },
     "web": {
       "bundler": "metro",
