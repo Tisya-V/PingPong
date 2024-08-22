@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "pingpong",
+    "slug": "pingpong",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/app-splash.webp",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.tisv.pingpong",
+      "icon": "./assets/app-icon.jpg"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "62bb10c0-0522-4545-834a-12a608c45452"
+      }
+    }
+  }
+}
