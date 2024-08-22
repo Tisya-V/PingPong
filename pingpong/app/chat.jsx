@@ -7,13 +7,14 @@ import Message from '../components/Message';
 import { Timestamp } from 'firebase/firestore';
 import { StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
-
+import { getAuth } from 'firebase/auth';
 
 export default function Chat(props) {
     const userID = props.route.params.userID;
     const [text, setText] = useState("");
     const [messages, setMessages] = useState([]);
     const db = getFirestore(app);
+    const auth = getAuth(app);
     
     useEffect(() => {
       const messagesQuery = query(collection(db, 'messages'), orderBy('timestamp', 'asc'));
@@ -26,7 +27,7 @@ export default function Chat(props) {
         setMessages(messagesArray);
         console.log(messagesArray)
       }, (error) => {
-        console.error("Failed to subscribe to messages:", error);
+        console.error("Failed to subscribe to messages:", error, "Auth status", auth.currentUser);
       });
   
       // Clean up the subscription on component unmount

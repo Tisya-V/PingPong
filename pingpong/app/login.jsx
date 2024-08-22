@@ -2,8 +2,8 @@ import React from "react";
 import { View, Text } from "react-native";
 import { TextInput, Button } from "react-native-paper";
 import { useState } from "react";
-import { getUserDoc } from "../store-procedures";
- 
+import { signIn } from "../store-procedures";
+import { schedulePushNotification } from "./notifications";
 
 
 export default function Login({navigation}) {
@@ -26,11 +26,10 @@ export default function Login({navigation}) {
             <Button title="Login" 
                     onPress={ async () => {
                         try {
-                            let userDoc = await getUserDoc(username);
-                            console.log(userDoc);
-                            if (userDoc.data().password === password) {
-                                console.log("Login successful. UserID: ", userDoc.id);
-                                navigation.navigate("Chat", {userID: userDoc.id});
+                            const userId = await signIn(username, password);
+                            if (userId !== null) {
+                                console.log("Login successful. UserID: ", userId);
+                                navigation.navigate("Chat", {userID: userId});
                             } else {
                                 console.log("Login failed");
                             }
@@ -40,6 +39,13 @@ export default function Login({navigation}) {
                     }
                 }
             >Login</Button>
+            <Button
+                title="Press to schedule a notification"
+                onPress={async () => {
+                 await schedulePushNotification();
+                 console.log("Notification scheduled");
+                }}
+            >Schedule Notification</Button>
         </View>    
     )
 }

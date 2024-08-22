@@ -8,7 +8,7 @@ export default function Message({ message, userID}) {
     console.log("UserID: ", userID);
     return (
         <View  style={[styles.message, (message.sender === userID) ? styles.yourMessage : styles.theirMessage]}>
-            <Text style={styles.text}>{message.content}</Text>
+            <Text style={styles.text}>{message.message}</Text>
         </View>
     )
 }

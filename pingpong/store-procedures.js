@@ -1,7 +1,37 @@
 import app from './firebase-config';
 import { getFirestore, collection, getDocs, setDoc, doc } from 'firebase/firestore';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import axios from 'axios';
 
 const db = getFirestore(app);
+const auth = getAuth(app);
+
+// Function to sign up a new user
+async function signUp(email, password) {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    console.log('User signed up:', userCredential.user);
+  } catch (error) {
+    if (error.code === 'auth/email-already-in-use') {
+      console.error("User already signed up: ", email);
+    } else {
+      console.error("Error signing up:", error.code, error.message);
+    }  }
+}
+
+
+// Function to sign in an existing user
+async function signIn(email, password) {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    console.log('User signed in:', userCredential.user);
+    console.log('User signed in:', userCredential.user.uid);
+    return userCredential.user.uid;
+
+  } catch (error) {
+    console.error('Error signing in:', error);
+  }
+}
 
 // Function to fetch messages
 async function fetchMessages() {
@@ -18,13 +48,13 @@ async function fetchMessages() {
 }
 
 // Function to write a message with text and sender to Firestore
-async function writeMessage(content, sender, timestamp) {
+async function writeMessage(message, sender, timestamp) {
   try {
     // Create a new document with a generated ID in the 'messages' collection
     const docRef = doc(collection(db, "messages"));
     // Set the document data
     await setDoc(docRef, {
-      content: content,
+      message: message,
       sender: sender,
       timestamp: timestamp,
     });
@@ -57,4 +87,4 @@ async function getPassword(username) {
   return null;
 }
 
-export { fetchMessages, writeMessage, getUserDoc, getPassword};
+export { signIn, fetchMessages, writeMessage, getUserDoc, getPassword};
