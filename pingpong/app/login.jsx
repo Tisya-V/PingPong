@@ -40,7 +40,7 @@ export default function Login({navigation}) {
                 }
             >Login</Button>
             <Button
-                title="Press to schedule a notification"
+                title="TEST NOTIFICATION"
                 onPress={async () => {
                  await schedulePushNotification();
                  console.log("Notification scheduled");
