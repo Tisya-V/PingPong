@@ -22,7 +22,11 @@ jobs:
           token: ${{ secrets.PING_PONG_TOKEN }}
 
       - name: 📦 Install dependencies
-        run: yarn install
+        run: |
+          cd pingpong
+          yarn install
 
       - name: 🚀 Create update
-        run: eas update --auto --non-interactive
+        run: |
+          cd pingpong
+          eas update --auto --non-interactive
