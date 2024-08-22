@@ -7,7 +7,7 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/app-splash.webp",
+      "image": "./assets/app-splash.jpg",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
