@@ -19,7 +19,7 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          token: ${{ secrets.PING_PONG_TOKEN }}
 
       - name: 📦 Install dependencies
         run: yarn install
