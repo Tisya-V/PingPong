@@ -28,4 +28,4 @@ jobs:
       - name: 🚀 Create build
         run: |
           cd pingpong
-          eas build -p android --non-interactive
+          eas build -p android --profile preview --non-interactive
