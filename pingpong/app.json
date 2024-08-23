@@ -19,8 +19,7 @@
       "icon": "./assets/app-icon.jpg"
     },
     "web": {
-      "bundler": "metro",
-      "output": "static"
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router"

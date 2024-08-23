@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { ScrollView, View, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { getFirestore, collection, query, onSnapshot, orderBy } from 'firebase/firestore';
 import { app } from '../firebase-config';
-import { writeMessage } from '../store-procedures';
+import { writeMessage, fetchTokenFromFirestore } from '../store-procedures';
 import Message from '../components/Message';
 import { Timestamp } from 'firebase/firestore';
 import { StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { getAuth } from 'firebase/auth';
+import { sendPushNotification } from './notifications';
+import { TIS, TAN } from './app-constants';
 
 export default function Chat(props) {
     const userID = props.route.params.userID;
@@ -15,6 +17,8 @@ export default function Chat(props) {
     const [messages, setMessages] = useState([]);
     const db = getFirestore(app);
     const auth = getAuth(app);
+
+    const recipient = (userID === TIS) ? TAN : TIS;
     
     useEffect(() => {
       const messagesQuery = query(collection(db, 'messages'), orderBy('timestamp', 'asc'));
@@ -25,7 +29,6 @@ export default function Chat(props) {
           ...doc.data(),
         }));
         setMessages(messagesArray);
-        console.log(messagesArray)
       }, (error) => {
         console.error("Failed to subscribe to messages:", error, "Auth status", auth.currentUser);
       });
@@ -50,6 +53,12 @@ export default function Chat(props) {
                                     onPress={async () => {
                                       setText("")
                                       console.log("Sending " + text + " with sender " + userID)
+
+                                      await fetchTokenFromFirestore(recipient).then((token) => {
+                                        console.log("Token: ", token);
+                                        sendPushNotification(token, {title: "New Message", body: text});
+                                      });
+
                                       await writeMessage(text, userID, Timestamp.now());
                                       } }
                     />}

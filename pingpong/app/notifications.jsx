@@ -1,9 +1,11 @@
 import React, {useState, useEffect, useRef} from 'react';
 import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
 import { Platform, Alert } from 'react-native';
-import * as Device from 'expo-device';
+import app from '../firebase-config';
+import { getFirestore, doc, setDoc, collection } from 'firebase/firestore';
 
+
+const db = getFirestore(app);
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -13,98 +15,76 @@ Notifications.setNotificationHandler({
     }),
   });
   
-export default function useNotifications() {
-    const [expoPushToken, setExpoPushToken] = useState('');
-    const [channels, setChannels] = useState([]);
-    const [notification, setNotification] = useState(undefined);
-    const notificationListener = useRef();
-    const responseListener = useRef();
-  
-    useEffect(() => {
-        // Request permission to send notifications
-        const requestNotificationPermissions = async () => {
-            const settings = await Notifications.requestPermissionsAsync();
-            if (settings.granted || settings.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL) {
-                console.log('Notification permissions granted.');
-            }
-        };
-    
-        requestNotificationPermissions();
-    
-        // Optionally, define notification handling while the app is in the foreground
-        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-            console.log('Notification received in the app:', notification);
-        });
-    
-        return () => {
-            // Clean up: Remove the notification listener
-            if (notificationListener.current) {
-                Notifications.removeNotificationSubscription(notificationListener.current);
-            }
-        };
-    }, []);
-
-
-    return { expoPushToken, channels, notification }
-}
-
-async function schedulePushNotification() {
-    await Notifications.scheduleNotificationAsync({
-        content: {
-            title: "You've got mail! 📬",
-            body: 'Here is the notification body',
-            data: { data: 'goes here', test: { test1: 'more data' } },
-        },
-        trigger: null,
-    });
-}   
-
-async function registerForPushNotificationsAsync() {
+async function registerForPushNotificationsAsync(userId) {
     let token;
 
     if (Platform.OS === 'android') {
-        await Notifications.setNotificationChannelAsync('default', {
-            name: 'default',
-            importance: Notifications.AndroidImportance.MAX,
-            vibrationPattern: [0, 250, 250, 250],
-            lightColor: '#FF231F7C',
-        });
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.DEFAULT,
+        sound: true,
+      });
     }
 
-    if (Device.isDevice) {
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
-        if (existingStatus !== 'granted') {
-            const { status } = await Notifications.requestPermissionsAsync();
-            finalStatus = status;
-        }
-        if (finalStatus !== 'granted') {
-            Alert.alert('Failed to get push token for push notification!');
-            return;
-        }
-        // Learn more about projectId:
-        // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
-        // EAS projectId is used here.
-        try {
-            const projectId =
-                Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
-            if (!projectId) {
-                throw new Error('Project ID not found');
-            }
-            token = (
-                await Notifications.getExpoPushTokenAsync({
-                    projectId,
-                })
-            ).data;
-            console.log(token);
-        } catch (e) {
-            token = `${e}`;
-        }
-    } else {
-        Alert.alert('Must use physical device for Push Notifications');
+    const { status: status } = await Notifications.getPermissionsAsync();
+    if (status !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Failed to get push token for push notification!');
+        return;
+      }
     }
 
-    return token;
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+
+    console.log('Expo Push Token:', token);
+
+    // Save token to Firestore
+    if (token) {
+      await saveTokenToFirestore(token, userId);
+    }
 }
 
-export { schedulePushNotification, registerForPushNotificationsAsync };
+async function saveTokenToFirestore(token, userId) {
+// You might want to include a unique identifier for the user
+try {
+    console.log('Doc:', doc, "User:", userId);
+    const userDoc = doc(db, 'users', userId);
+    await setDoc(userDoc, {
+        expoPushToken: token,
+    }, { merge: true });
+
+    console.log('Push token saved to Firestore');
+} catch (error) {
+    console.error('Error saving push token:', error);
+}
+}
+
+async function sendPushNotification(expoPushToken, message) {
+    const notificationMessage = {
+      to: expoPushToken,
+      sound: 'default',
+      title: message.title,
+      body: message.body,
+      data: message.data || {},
+    };
+  
+    try {
+      const response = await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(notificationMessage),
+      });
+  
+      const responseData = await response.json();
+      console.log('Notification response:', responseData);
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+}
+
+
+export { sendPushNotification, registerForPushNotificationsAsync };

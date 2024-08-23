@@ -1,7 +1,8 @@
 import app from './firebase-config';
-import { getFirestore, collection, getDocs, setDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, getDoc, setDoc, doc } from 'firebase/firestore';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const db = getFirestore(app);
 const auth = getAuth(app);
@@ -19,6 +20,26 @@ async function signUp(email, password) {
     }  }
 }
 
+async function fetchTokenFromFirestore(userId) {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (userDoc.exists) {
+      const data = userDoc.data();
+      if (data && data.expoPushToken) {
+        return data.expoPushToken;
+      } else {
+        console.log('No Expo Push Token found');
+        return null;
+      }
+    } else {
+      console.log('No such document!');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching push token:', error);
+    return null;
+  }
+}
 
 // Function to sign in an existing user
 async function signIn(email, password) {
@@ -87,4 +108,4 @@ async function getPassword(username) {
   return null;
 }
 
-export { signIn, fetchMessages, writeMessage, getUserDoc, getPassword};
+export { signIn, fetchMessages, writeMessage, getUserDoc, getPassword, fetchTokenFromFirestore};

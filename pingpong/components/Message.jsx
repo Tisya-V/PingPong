@@ -4,8 +4,6 @@ import { PaperProvider } from "react-native-paper";
 import { SENDER } from "../app/app-constants";
 
 export default function Message({ message, userID}) {
-    console.log("Message: ", message);
-    console.log("UserID: ", userID);
     return (
         <View  style={[styles.message, (message.sender === userID) ? styles.yourMessage : styles.theirMessage]}>
             <Text style={styles.text}>{message.message}</Text>

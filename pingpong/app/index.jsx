@@ -19,7 +19,7 @@ export default function Index() {
   const responseListener = useRef();
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then(token => token && setExpoPushToken(token));
+    // registerForPushNotificationsAsync().then(token => token && setExpoPushToken(token));
     
     if (Platform.OS === 'android') {
       Notifications.getNotificationChannelsAsync().then(value => setChannels(value ?? []));
