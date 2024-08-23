@@ -25,7 +25,7 @@ jobs:
           cd pingpong
           npm install
 
-      - name: 🚀 Create update
+      - name: 🚀 Create build
         run: |
           cd pingpong
-          eas update --auto --non-interactive
+          eas build -p android --auto --non-interactive
